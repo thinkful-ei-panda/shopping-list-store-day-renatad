@@ -5,17 +5,20 @@ const store = {
     { id: cuid(), name: 'milk', checked: true },
     { id: cuid(), name: 'bread', checked: false }
   ],
-  hideCheckedItems: false
+  hideCheckedItems: false,
 };
 
 const generateItemElement = function (item) {
   let itemTitle = `<span class='shopping-item shopping-item__checked'>${item.name}</span>`;
   if (!item.checked) {
     itemTitle = `
-     <span class='shopping-item'>${item.name}</span>
+    <div class="js-edit-item">
+      <input class="shopping-item" type="text" value="${item.name}">
+    </div>
     `;
   }
 
+  //didn't do a button added to the list, decided to just edit the field itself.
   return `
     <li class='js-item-element' data-item-id='${item.id}'>
       ${itemTitle}
@@ -65,6 +68,23 @@ const render = function () {
 const addItemToShoppingList = function (itemName) {
   store.items.push({ id: cuid(), name: itemName, checked: false });
 };
+
+
+// function handling the edit part
+const handleEditShoppingItem = function () {
+  $('.js-edit-item').keypress(event => {
+    const value = $(event.currentTarget).find('.shopping-item').val();
+    const id = getItemIdFromElement(event.currentTarget);
+    editListItemName(id, value);
+  });
+};
+
+// function to get list item
+const editListItemName = function (id, itemName) {
+  const item = store.items.find(item => item.id === id);
+  item.name = itemName;
+};
+
 
 const handleNewItemSubmit = function () {
   $('#js-shopping-list-form').submit(function (event) {
@@ -160,6 +180,7 @@ const handleShoppingList = function () {
   handleItemCheckClicked();
   handleDeleteItemClicked();
   handleToggleFilterClick();
+  handleEditShoppingItem();
 };
 
 // when the page loads, call `handleShoppingList`
